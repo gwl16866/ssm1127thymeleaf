@@ -1,0 +1,112 @@
+<html  xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <meta charset="UTF-8" />
+    <title></title>
+    <script src="/jjss/jquery-3.3.1.js"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            $.ajax({
+                type:"post",
+                url:"/test/selectDept.do",
+                contentType:"application/json",
+                success:function (data) {
+                    var str="<option value='-1'>请选择</option>";
+                    for (var i=0;i<data.length;i++){
+                        str+="<option value='"+data[i].deptNo+"'>"+data[i].deptName+"</option>";
+                    }
+                    $(".dept").html(str);
+
+                }
+
+
+            });
+
+
+            $("#butt").click(function () {
+                var num=$("table tr").length;
+
+                $("#table").append("    <tr>\n" +
+                    "        <td>姓名：</td>\n" +
+                    "        <td><input type=\"text\" name=\"empList["+num+"].empName\"></td>\n" +
+                    "\n" +
+                    "\n" +
+                    "        <td>性别：</td>\n" +
+                    "        <td><select name=\"empList["+num+"].empSex\">\n" +
+                    "            <option value=\"1\">男</option>\n" +
+                    "            <option value=\"2\">女</option>\n" +
+                    "            </select>\n" +
+                    "        </td>\n" +
+                    "\n" +
+                    "        <td>电话：</td>\n" +
+                    "        <td> <input type=\"text\" name=\"empList["+num+"].phone\"></td>\n" +
+                    "\n" +
+                    "\n" +
+                    "\n" +
+                    "\n" +
+                    "        <td>部门：</td>\n" +
+                    "        <td> <select class='dept' name=\"empList["+num+"].deptNo\">\n" +
+                    "        </select></td>\n" +
+                    "    </tr>");
+                $.ajax({
+                    type:"post",
+                    url:"/test/selectDept.do",
+                    contentType:"application/json",
+                    success:function (data) {
+                        var str="<option value='-1'>请选择</option>";
+                        for (var i=0;i<data.length;i++){
+                            str+="<option value='"+data[i].deptNo+"'>"+data[i].deptName+"</option>";
+                        }
+                        $(".dept").html(str);
+
+                    }
+
+
+                });
+            });
+
+        });
+
+    </script>
+</head>
+<body>
+
+<h1>添加员工</h1>
+
+<input type="button" id="butt" value="多条添加">
+<form action="/test/insert.do" method="post">
+
+<table border="1" id="table">
+    <tr>
+        <td>姓名：</td>
+        <td><input type="text" name="empList[0].empName"></td>
+
+
+        <td>性别：</td>
+        <td><select name="empList[0].empSex">
+            <option value="1">男</option>
+            <option value="2">女</option>
+            </select>
+        </td>
+
+        <td>电话：</td>
+        <td> <input type="text" name="empList[0].phone"></td>
+
+
+
+
+        <td>部门：</td>
+        <td> <select class="dept" name="empList[0].deptNo">
+        </select></td>
+    </tr>
+
+
+</table>
+    <input type="submit" value="添加">
+
+</form>
+
+
+
+</body>
+</html>

@@ -1,0 +1,31 @@
+<html  xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <meta charset="UTF-8" />
+    <title></title>
+
+</head>
+<body>
+
+<form action="/test/update.do" method="post">
+
+         <input type="hidden" th:name="empNo" th:value="${emp.empNo}">
+    姓名：<input type="text" th:name="empName" th:value="${emp.empName}">
+
+    性别：<select name="empSex">
+    <option th:value="1" th:selected="${emp.empSex eq 1 }">男</option>
+    <option th:value="2" th:selected="${emp.empSex eq 2 }" >女</option>
+         </select>
+
+    电话：<input type="text" th:name="phone" th:value="${emp.phone}">
+
+    部门：
+    <select th:id="dept" th:name="deptNo" >
+            <option th:selected="${depts.deptNo eq emp.deptNo}" th:each="depts:${deptList}"  th:value="${depts.deptNo}" th:text="${depts.deptName}"></option>
+    </select>
+    <input type="submit" value="修改">
+</form>
+
+
+
+</body>
+</html>

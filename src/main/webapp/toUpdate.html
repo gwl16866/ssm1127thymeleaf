@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <meta charset="utf-8">
+    <title>Layui</title>
+    <base th:href="${#request.getContextPath()}+'/'">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="layui/css/layui.css"  media="all">
+    <script src="jjss/jquery-3.3.1.js"></script>
+
+    <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+</head>
+<body>
+
+<h2 align="center">信息修改</h2>
+<div >
+<form class="layui-form" action="" method="get">
+    <input type="hidden" name="empNo" th:value="${emp.empNo}">
+    <div class="layui-form-item">
+        <label class="layui-form-label">姓名</label>
+        <div class="layui-input-block">
+            <input type="text" th:value="${emp.empName}" name="empName" lay-verify="title" autocomplete="off" placeholder="请输入姓名" class="layui-input" lay-size="5">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">电话</label>
+        <div class="layui-input-block">
+            <input type="text" th:value="${emp.phone}" name="phone" lay-verify="required" lay-reqtext="电话，岂能为空？" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">性别</label>
+        <div class="layui-input-block">
+            <input type="radio" name="empSex" value="1" title="男" th:checked='${emp.empSex eq 1}'>
+            <input type="radio" name="empSex" value="2" title="女" th:checked='${emp.empSex eq 2}'>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">部门</label>
+            <div class="layui-input-inline">
+                <select name="deptNo">
+                    <option th:selected="${depts.deptNo eq emp.deptNo}" th:each="depts:${deptList}"  th:value="${depts.deptNo}" th:text="${depts.deptName}"></option>
+                </select>
+            </div>
+    </div>
+
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">入职时间</label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="date1" th:value="${emp.jobtime}" placeholder="yyyy-MM-dd" name="jobtime">
+        </div>
+    </div>
+
+    <div class="layui-upload">
+        <button type="button" class="layui-btn" id="test1">上传图片</button>
+        <div class="layui-upload-list">
+            <img class="layui-upload-img" id="demo1" width="200" height="100" th:src="image+'/'+${emp.img}">
+            <p id="demoText"></p>
+        </div>
+    </div>
+
+    <input type="hidden" id="img_hidden" name="img" >
+
+
+    <div class="layui-form-item">
+        <button class="layui-btn" lay-submit lay-filter="demo2">立即提交</button>
+        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+    </div>
+</form>
+</div>
+<script src="layui/layui.js" charset="utf-8"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+    layui.use(['form','layer','upload','laydate'], function(){
+        var form = layui.form,layer= layui.layer,upload=layui.upload,laydate=layui.laydate;
+
+        //时间
+        laydate.render({
+            elem: '#date1'
+        });
+        
+        form.on('submit(demo2)', function(data){
+            var da=data.field;
+            $.ajax({
+                type:'post',
+                url:'test/update.do',
+                data:da,
+                dataType:"json",
+                success:function (data) {
+                    if(data == 0){
+                        var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                        setTimeout(function () {
+                            parent.layer.close(index);
+                        },1100);
+
+                       layer.msg("修改成功，1秒关闭",{
+                           icon:1,
+                           time:1000
+                       },function() {
+                         //do...
+                           parent.location.reload();
+                        });
+
+                    }
+                }
+
+            });
+
+
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });
+
+
+        //普通图片上传
+        var uploadInst = upload.render({
+            elem: '#test1'
+            ,url: 'test/upLoad.do'
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                    $('#demo1').attr('src', result); //图片链接（base64）
+                });
+            }
+            ,done: function(res){
+                layer.msg('上传成功');
+                document.getElementById("img_hidden").value=res.fileName;
+                // $("#img_hidden").val(res.fileName);
+                //上传成功
+            }
+            ,error: function(){
+                //演示失败状态，并实现重传
+                var demoText = $('#demoText');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function(){
+                    uploadInst.upload();
+                });
+            }
+        });
+
+
+
+
+
+
+    });
+</script>
+
+
+</body>
+</html>

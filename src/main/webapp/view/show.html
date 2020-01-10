@@ -1,0 +1,128 @@
+<html  xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <meta charset="UTF-8" />
+    <title></title>
+    <script src="/jjss/jquery-3.3.1.js"></script>
+    <script type="text/javascript">
+
+        function cha(){
+            var num=$("#showNumSize").val();
+
+            location.href="http://localhost:8080/test/queryAll.do?page=1&pageSize="+num;
+        }
+
+        function allchange(e){
+            var some=document.getElementsByName("ids");
+            //var some=$(".name").Array;
+            if(e.checked){
+                for(var i=0;i<some.length;i++){
+                    some[i].checked=true;
+                }
+            }else{
+                for(var i=0;i<some.length;i++){
+                    some[i].checked=false;
+                }
+            }
+        }
+
+        function shan() {
+            var yes=document.getElementsByName("ids");
+            var flag=false;
+            for(var i=0;i<yes.length;i++){
+                if(yes[i].checked){
+                    flag=true;
+                }
+            }
+            if(flag){
+                deletes();
+            }else{
+                alert("请选择你要删除的哐哐");
+            }
+
+        }
+
+
+        function deletes(){
+            //var somes=document.getElementsByName("ids");
+            var array=new Array();
+            $(":checkbox[name='ids']").each(function () {
+                if(this.checked){
+                    array.push($(this).val());
+                }
+            });
+            location.href="http://localhost:8080/test/deleteSome.do?ids="+array+"";
+
+        }
+
+    </script>
+</head>
+<body>
+
+<form action="/test/queryAll.do" method="post">
+    姓名：<input th:type="text" th:name="empName">
+    性别：<select th:name="empSex">
+            <option th:value="0">请选择</option>
+            <option th:value="1">男</option>
+            <option th:value="2">女</option>
+         </select>
+    电话：<input th:type="text" th:name="phone">
+    部门：<select th:name="deptNo">
+            <option value="0">请选择</option>
+            <option th:each="dept:${deptList}" th:value="${dept.deptNo}">[[${dept.deptName}]]</option>
+         </select>
+    <input type="submit" value="模糊查询">
+</form>
+
+
+
+<a href="/view/insert.html">添加</a>
+<a href="javascript:void(0)" onclick="shan()">批量删除</a>
+<table border="1">
+    <tr>
+
+        <td><input type="checkbox" id="all" onclick="allchange(this)">编号</td> <td>姓名</td> <td>性别</td><td>电话</td><td>部门</td><td>操作</td></tr>
+
+        <tr th:if="${#lists.isEmpty(empList.records)}"><td th:colspan="6">暂无数据</td></tr>
+
+
+        <tr th:each="emp,star:${empList.getRecords()}">
+
+            <td><input type="checkbox" th:name="ids" th:value="${emp.empNo}" >[[${star.count}]]</td>
+            <td>[[${emp.empName}]]</td>
+            <td th:text="${emp.empSex eq 1 ? '男' : '女' }"></td>
+            <td th:text="${emp.phone}"></td>
+            <td th:text="${emp.deptObject.deptName}"></td>
+            <td>
+                <a th:href="@{/test/selectEmpById.do(id=${emp.empNo})}">修改</a>
+                |
+                <a th:href="@{/test/delete.do(id=${emp.empNo})}">删除</a>
+            </td>
+        </tr>
+
+
+</table>
+<span>当前是第[[${empList.current}]]页,共[[${empList.pages}]]页</span>
+<br>
+<span th:unless="${empList.current eq 1}">
+<a th:href="@{/test/queryAll.do(page=1,empName=${emp.empName},empSex=${emp.empSex},phone=${emp.phone},deptNo=${emp.deptNo})}">首页</a>
+</span>
+
+<span th:if="${empList.current ne 1}">
+<a th:href="@{/test/queryAll.do(page=${empList.current -1},empName=${emp.empName},empSex=${emp.empSex},phone=${emp.phone},deptNo=${emp.deptNo})}">上一页</a>
+</span>
+
+<span th:each="c,cc:${empList.pages}">
+    <a th:href="@{/test/queryAll.do(page=${cc.count},empName=${emp.empName},empSex=${emp.empSex},phone=${emp.phone},deptNo=${emp.deptNo})}">[[${cc.count}]]</a>
+</span>
+
+<span th:if="${empList.current ne empList.pages}">
+<a th:href="@{/test/queryAll.do(page=${empList.current +1},empName=${emp.empName},empSex=${emp.empSex},phone=${emp.phone},deptNo=${emp.deptNo})}">下一页</a>
+</span>
+
+
+<span th:unless="${empList.current eq empList.pages}">
+<a th:href="@{/test/queryAll.do(page=${empList.pages},empName=${emp.empName},empSex=${emp.empSex},phone=${emp.phone},deptNo=${emp.deptNo})}">尾页</a>
+</span>
+
+</body>
+</html>
